@@ -11,7 +11,7 @@ document.getElementById('uploadButton').addEventListener('click', async () => {
     formData.append('image', file);
 
     try {
-        const response = await fetch('https://your-api-endpoint/upload', {
+        const response = await fetch('https://upload-image-zeta.vercel.app/upload', {
             method: 'POST',
             body: formData,
         });
@@ -33,7 +33,7 @@ async function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
     
-    const response = await fetch('https://your-api-endpoint/upload', {
+    const response = await fetch('https://upload-image-zeta.vercel.app/upload', {
         method: 'POST',
         body: formData,
     });
