@@ -195,18 +195,29 @@ async function uploadImg(file) {
           method: 'POST',
           body: formData
         });
-        const result = await response.json();
 
-        // Sembunyikan loading setelah selesai
-        loadingSpinner.style.display = 'none';
-        loadingText.style.display = 'none';
-
-        // Tampilkan hasil upload
-        if (response.ok) {
-          resultText.innerHTML = `<a href="${result.link}" target="_blank">${result.link}</a>`;
+        // Cek apakah response JSON atau bukan
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json();
+          
+          // Sembunyikan loading setelah selesai
+          loadingSpinner.style.display = 'none';
+          loadingText.style.display = 'none';
+  
+          // Tampilkan hasil upload
+          if (response.ok) {
+            resultText.innerHTML = `<a href="${result.link}" target="_blank">${result.link}</a>`;
+          } else {
+            resultText.innerHTML = `<span style="color: red;">Error: ${result.message}</span>`;
+          }
         } else {
-          resultText.innerHTML = `<span style="color: red;">Error: ${result.message}</span>`;
+          // Jika respons bukan JSON, tampilkan respons sebagai teks
+          const errorText = await response.text();
+          throw new Error(`Unexpected response format: ${errorText}`);
         }
+
       } catch (error) {
         console.error('Error uploading file:', error);
         loadingSpinner.style.display = 'none';
