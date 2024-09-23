@@ -99,6 +99,32 @@
     code {
       font-family: "Courier New", Courier, monospace;
     }
+
+    /* Loading spinner */
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 8px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ff4757;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Teks loading */
+    #loadingText {
+      display: none;
+      font-size: 1.2rem;
+      color: #ff4757;
+      margin-top: 20px;
+    }
+
   </style>
 </head>
 <body>
@@ -107,6 +133,10 @@
     <input type="file" id="image" name="image" accept="image/*" required />
     <button type="submit">Upload</button>
   </form>
+
+  <!-- Spinner dan teks loading -->
+  <div id="loading" class="spinner"></div>
+  <p id="loadingText">Uploading...</p>
 
   <h2>Upload Result</h2>
   <p id="result"></p>
@@ -144,9 +174,18 @@ async function uploadImg(file) {
 
   <script>
     const form = document.getElementById('uploadForm');
+    const loadingSpinner = document.getElementById('loading');
+    const loadingText = document.getElementById('loadingText');
+    const resultText = document.getElementById('result');
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      
+
+      // Tampilkan loading spinner dan teks
+      loadingSpinner.style.display = 'block';
+      loadingText.style.display = 'block';
+      resultText.innerHTML = ''; // Kosongkan hasil sebelumnya
+
       const fileInput = document.getElementById('image');
       const formData = new FormData();
       formData.append('image', fileInput.files[0]);
@@ -157,9 +196,22 @@ async function uploadImg(file) {
           body: formData
         });
         const result = await response.json();
-        document.getElementById('result').innerHTML = `<a href="${result.link}" target="_blank">${result.link}</a>`;
+
+        // Sembunyikan loading setelah selesai
+        loadingSpinner.style.display = 'none';
+        loadingText.style.display = 'none';
+
+        // Tampilkan hasil upload
+        if (response.ok) {
+          resultText.innerHTML = `<a href="${result.link}" target="_blank">${result.link}</a>`;
+        } else {
+          resultText.innerHTML = `<span style="color: red;">Error: ${result.message}</span>`;
+        }
       } catch (error) {
         console.error('Error uploading file:', error);
+        loadingSpinner.style.display = 'none';
+        loadingText.style.display = 'none';
+        resultText.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
       }
     });
   </script>
