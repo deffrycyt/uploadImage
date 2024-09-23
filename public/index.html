@@ -20,6 +20,7 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      padding: 20px;
     }
 
     h1 {
@@ -32,6 +33,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      margin-bottom: 30px;
     }
 
     input[type="file"] {
@@ -81,6 +83,22 @@
     a:hover {
       text-decoration: underline;
     }
+
+    /* Style untuk code block */
+    pre {
+      background-color: #282c34;
+      color: #61dafb;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
+    }
   </style>
 </head>
 <body>
@@ -92,6 +110,33 @@
 
   <h2>Upload Result</h2>
   <p id="result"></p>
+
+  <!-- Bagian untuk menampilkan contoh API -->
+  <h2>Example API Usage</h2>
+  <pre><code id="apiExample">
+async function uploadImg(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const response = await fetch('https://upload-image-zeta.vercel.app/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    
+    if (response.ok) {
+      return result.link;  // Link to the uploaded image
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+}
+  </code></pre>
 
   <footer>
     <p>Created by <a href="#">Deffri Gans</a></p>
@@ -107,7 +152,7 @@
       formData.append('image', fileInput.files[0]);
 
       try {
-        const response = await fetch('http://localhost:3000/upload', {
+        const response = await fetch('https://upload-image-zeta.vercel.app/upload', {
           method: 'POST',
           body: formData
         });
