@@ -1,46 +1,38 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const cors = require('cors');
 const app = express();
+const cors = require('cors');
 
-// Enable CORS for API access
-app.use(cors());
+// Middleware untuk mengizinkan request dari domain front-end
+app.use(cors({
+  origin: 'https://upload-image-zeta.vercel.app'
+}));
 
-// Set up storage engine for uploaded files
+// Setting up Multer untuk menyimpan file
 const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 1000000 }, // Limit to 1MB
-}).single('image');
+const upload = multer({ storage });
 
-// Serve static files from "uploads" folder
-app.use('/uploads', express.static('uploads'));
-
-// Home route to serve the HTML form
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Route untuk upload file
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+  // Buat link ke gambar yang di-upload
+  const fileLink = `https://upload-image-zeta.vercel.app/uploads/${req.file.filename}`;
+  res.json({ link: fileLink });
 });
 
-// API route to handle image upload
-app.post('/upload', (req, res) => {
-  upload(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Upload failed', error: err });
-    }
-    // Send back the file link as response
-    const fileLink = `http://localhost:3000/uploads/${req.file.filename}`;
-    res.status(200).json({ message: 'Upload successful', link: fileLink });
-  });
-});
-
-// Start the server
-app.listen(3000, () => {
-  console.log('Server started on http://localhost:3000');
+// Jalankan server di port 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
