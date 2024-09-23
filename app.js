@@ -32,7 +32,6 @@ app.post('/upload', upload.single('image'), (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  // Jika file berhasil di-upload, kembalikan link file
   const fileLink = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
   res.json({ link: fileLink });
 });
@@ -45,9 +44,10 @@ app.use((req, res, next) => {
 // Penanganan kesalahan server
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Server error' });
+  res.status(500).json({ message: 'Server error', error: err.message });
 });
 
+// Mulai server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
