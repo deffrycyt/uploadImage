@@ -2,9 +2,13 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS
+app.use(cors());
 
 // Storage untuk meng-upload file ke folder public/uploads
 const storage = multer.diskStorage({
